@@ -42,13 +42,11 @@ const server = net.createServer((socket) => {
 
     socket.write(response, 'utf-8', () => {
       socket.end();
-      server.close();
     });
   });
 
   socket.on("close", () => {
     socket.end();
-    server.close();
   });
 });
 
