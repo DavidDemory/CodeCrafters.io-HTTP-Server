@@ -19,8 +19,10 @@ const server = net.createServer((socket) => {
 
     if(index === '/'){
      response = 'HTTP/1.1 200 OK\r\n\r\n';
+    } else if (index.startsWith('/echo')) {
+      const text = index.replace('/echo/', '');
+      response = `HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nContent-length: ${text.length}\r\n\r\n${text}`;
     }
-
     socket.write(response, 'utf-8', () => {
       socket.end();
       server.close();
