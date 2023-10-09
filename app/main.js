@@ -11,6 +11,19 @@ const parseIndex = (data) => {
   return index;
 }
 
+const retrieveUserAgentHeader = (data) => {
+  const parsedLines = data.toString().split("\r\n");
+  let userAgentHeader;
+
+  parsedLines.forEach((line) => {
+    if(line.startsWith('User-Agent')) {
+      userAgentHeader = line.replace('User-Agent: ', '')
+    }
+  })
+
+  return userAgentHeader;
+}
+
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const index = parseIndex(data);
@@ -22,7 +35,11 @@ const server = net.createServer((socket) => {
     } else if (index.startsWith('/echo')) {
       const text = index.replace('/echo/', '');
       response = `HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nContent-length: ${text.length}\r\n\r\n${text}`;
+    } else if (index === '/user-agent') {
+      const userAgentHeader = retrieveUserAgentHeader(data);
+      response = `HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nContent-length: ${userAgentHeader.length}\r\n\r\n${userAgentHeader}`;
     }
+
     socket.write(response, 'utf-8', () => {
       socket.end();
       server.close();
